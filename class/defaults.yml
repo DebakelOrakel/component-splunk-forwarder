@@ -1,0 +1,4 @@
+parameters:
+  splunk_forwarder:
+    =_metadata: {}
+    namespace: syn-splunk-forwarder

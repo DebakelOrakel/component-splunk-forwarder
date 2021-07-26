@@ -1,0 +1,12 @@
+parameters:
+  kapitan:
+    compile:
+      - input_paths:
+          - splunk-forwarder/component/app.jsonnet
+        input_type: jsonnet
+        output_path: apps/
+      - input_paths:
+          - splunk-forwarder/component/main.jsonnet
+        input_type: jsonnet
+        output_path: splunk-forwarder/
+
