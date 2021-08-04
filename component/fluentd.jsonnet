@@ -61,7 +61,13 @@ local configmap = kube.ConfigMap(app_name) {
                 </buffer>
                 # END: configurize buffer config
               </match>
-|||
+||| % ( if !params.fluentd.ssl.enabled then { tls_config: '' } else { tls_config: |||
+      <transport tls>
+        cert_path /secret/fluentd/tls.crt
+        private_key_path /secret/fluentd/tls.key
+        private_key_passphrase "#{ENV['FLUENTD_SSL_PASSPHRASE'] }"
+      </transport>
+||| })
   },
 };
 
@@ -72,9 +78,9 @@ local secret = kube.Secret(app_name) {
         },
     },
     data: {
-        'fluentd-ssl-passsphrase': std.base64(params.fluentd.passphrase),
         'shared_key': std.base64(params.fluentd.sharedkey),
         'hec-token': std.base64(params.splunk.token),
+        'fluentd-ssl-passsphrase': std.base64(params.fluentd.ssl.passphrase),
     } + ( if !params.fluentd.ssl.enabled then {} else {
         # TODO: consider using cert-manager
         'forwarder-tls.crt': std.base64(params.fluentd.ssl.cert),

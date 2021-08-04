@@ -8,13 +8,13 @@ parameters:
       loglevel: info
       replicas: 2
 
-      passphrase: {}        # insert value
       sharedkey: splunkforwarding
 
       ssl:
         enabled: false
         cert: {}
         key: {}
+        passphrase: {}      # insert value
 
       resources:
         requests:
