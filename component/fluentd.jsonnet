@@ -109,32 +109,35 @@ local secret_splunk = kube.Secret(app_name+'-splunk') {
     },
 };
 
-local service_spec(type='ClusterIP') = {
-    ports: [{
-        name: '24224-tcp',
-        protocol: 'TCP',
-        port: 24224,
-        targetPort: 24224,
-    }],
-    selector: app_selector,
-    type: type,
-    sessionAffinity: 'None',
-};
-local service = kube.Service(app_name) {
+local service_spec() = kube.Service(app_name) {
     metadata+: {
         labels+: {
             'app.kubernetes.io/component': 'fluentd',
         },
     },
-    spec: service_spec()
+    spec: {
+        ports: [{
+            name: '24224-tcp',
+            protocol: 'TCP',
+            port: 24224,
+            targetPort: 24224,
+        }],
+        selector: app_selector,
+        type: 'ClusterIP',
+        sessionAffinity: 'None',
+    }
 };
-local service_headless = kube.Service(app_name+'-headless') {
+local service = service_spec();
+local service_headless = service_spec() {
     metadata+: {
         labels+: {
-            'app.kubernetes.io/component': 'fluentd',
+            'app.kubernetes.io/name: openshift-logforwarding-splunk': app_name+'-headless',
         },
+        name: app_name+'-headless'
     },
-    spec: service_spec('None')
+    spec+: {
+        clusterIP: 'None'
+    },
 };
 
 local statefulset = kube.StatefulSet(app_name) {
