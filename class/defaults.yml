@@ -12,9 +12,9 @@ parameters:
 
       ssl:
         enabled: false
-        cert: {}
-        key: {}
-        passphrase: {}      # insert value
+        cert: ""
+        key: ""
+        passphrase: ""      # insert value
 
       resources:
         requests:
@@ -30,7 +30,7 @@ parameters:
       tolerations: []
 
     splunk:
-      token: {}             # insert value
+      token: ""             # insert value
       hostname: splunk.com  # insert value
       port: 8088
       insecure: true
