@@ -47,7 +47,7 @@ local configmap = kube.ConfigMap(app_name) {
                 hec_port "#{ENV['SPLUNK_PORT'] }"
                 hec_token "#{ENV['SPLUNK_TOKEN'] }"
                 host "#{ENV['NODE_NAME']}"
-                $(ca_cert_file)s
+                ca_file /secrets/splunk/splunk-ca.crt
                 # TODO: configurize buffer config
                 <buffer>
                       @type memory
@@ -61,12 +61,15 @@ local configmap = kube.ConfigMap(app_name) {
                 </buffer>
                 # END: configurize buffer config
               </match>
-||| % ( if !params.fluentd.ssl.enabled then { tls_config: '' } else { tls_config: |||
-      <transport tls>
-        cert_path /secret/fluentd/tls.crt
-        private_key_path /secret/fluentd/tls.key
-        private_key_passphrase "#{ENV['FLUENTD_SSL_PASSPHRASE'] }"
-      </transport>
+||| % ( if !params.fluentd.ssl.enabled then { 
+    tls_config: ''
+} else { 
+    tls_config: |||
+        <transport tls>
+          cert_path /secret/fluentd/tls.crt
+          private_key_path /secret/fluentd/tls.key
+          private_key_passphrase "#{ENV['FLUENTD_SSL_PASSPHRASE'] }"
+        </transport>
 ||| })
   },
 };
