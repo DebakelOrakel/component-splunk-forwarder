@@ -75,12 +75,12 @@ local secret = kube.Secret(app_name) {
         'fluentd-ssl-passsphrase': std.base64(params.fluentd.passphrase),
         'shared_key': std.base64(params.fluentd.sharedkey),
         'hec-token': std.base64(params.splunk.token),
-    } + ( if params.fluentd.ssl.enabled then {
+    } + ( if params.fluentd.ssl.enabled then {} else {
         # TODO: consider using cert-manager
         'forwarder-tls.crt': std.base64(params.fluentd.ssl.cert),
         'forwarder-tls.key': std.base64(params.fluentd.ssl.key),
         // 'ca-bundle.crt': std.base64(params.fluentd.ssl.cert),  
-    } else {} )
+    })
 /*
 data:
 {{- if .Values.forwarding.fluentd.ssl }}
@@ -193,8 +193,9 @@ local statefulset = kube.StatefulSet(app_name) {
                         { name: 'splunk-forwarder-config', readOnly: true, mountPath: '/etc/fluent/' },
                         { name: 'splunk-forwarder', readOnly: true, mountPath: '/secret/fluentd' },
                         { name: 'buffer', mountPath: '/var/log/fluentd' }, 
-                        if !params.splunk.insecure then { name: 'splunk-certs', readOnly: true, mountPath: '/secret/splunk' },
-                    ],
+                    ] + ( if params.splunk.insecure then [] else [
+                        { name: 'splunk-certs', readOnly: true, mountPath: '/secret/splunk' },
+                    ]),
                     livenessProbe: {
                         tcpSocket: {
                             port: 24224
@@ -226,9 +227,11 @@ local statefulset = kube.StatefulSet(app_name) {
                         ], 
                       }, 
                     },
-                    { name: 'buffer', emptyDir: {}, },   # TODO: if persistence disabled, see below
-                    if !params.splunk.insecure then { name: 'splunk-certs', secret: { secretName: app_name+'-splunk', items: [ { key: 'splunk-ca.crt', path: 'splunk-ca.crt' }, ], }, },
-                ],
+                    # TODO: if persistence disabled, see below
+                    { name: 'buffer', emptyDir: {}, },
+                ] + ( if params.splunk.insecure then [] else [
+                    { name: 'splunk-certs', secret: { secretName: app_name+'-splunk', items: [ { key: 'splunk-ca.crt', path: 'splunk-ca.crt' }, ], }, },
+                ]),
             },
         },
     },
