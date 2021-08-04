@@ -190,10 +190,10 @@ local statefulset = kube.StatefulSet(app_name) {
                     ],
                     args: [ 'fluentd' ],
                     volumeMounts: [
-                        { name: 'splunk-forwarder-config', readOnly: 'true', mountPath: '/etc/fluent/' },
-                        { name: 'splunk-forwarder', readOnly: 'true', mountPath: '/secret/fluentd' },
+                        { name: 'splunk-forwarder-config', readOnly: true, mountPath: '/etc/fluent/' },
+                        { name: 'splunk-forwarder', readOnly: true, mountPath: '/secret/fluentd' },
                         { name: 'buffer', readOnly: 'false', mountPath: '/var/log/fluentd' }, 
-                        if !params.splunk.insecure then { name: 'splunk-certs', readOnly: 'true', mountPath: '/secret/splunk' },
+                        if !params.splunk.insecure then { name: 'splunk-certs', readOnly: true, mountPath: '/secret/splunk' },
                     ],
                     livenessProbe: {
                         tcpSocket: {
