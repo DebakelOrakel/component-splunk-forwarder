@@ -4,8 +4,6 @@ local kube = import 'lib/kube.libjsonnet';
 local inv = kap.inventory();
 // The hiera parameters for the component
 local params = inv.parameters.splunk_forwarder;
-// local instance = inv.parameters._instance;
-// local instance = '987u3rfja';
 // local app_name = 'splunk-forwarder-'+instance;
 local app_name = inv.parameters._instance;
 local app_selector = {
@@ -131,7 +129,7 @@ local service = service_spec();
 local service_headless = service_spec() {
     metadata+: {
         labels+: {
-            'app.kubernetes.io/name: openshift-logforwarding-splunk': app_name+'-headless',
+            name: app_name+'-headless',
         },
         name: app_name+'-headless'
     },
