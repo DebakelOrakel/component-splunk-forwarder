@@ -216,7 +216,7 @@ local statefulset = kube.StatefulSet(app_name) {
                     terminationMessagePath: '/dev/termination-log',
                 }],
                 volumes: [
-                    { name: 'splunk-forwarder-config', configMap: { name: app_name, items: [ { key: 'td-agent.conf', path: 'fluent.conf' }, ], defaultMode: 420, optional: 'true' }, },
+                    { name: 'splunk-forwarder-config', configMap: { name: app_name, items: [ { key: 'td-agent.conf', path: 'fluent.conf' }, ], defaultMode: 420, optional: true }, },
                     { 
                       name: 'splunk-forwarder', 
                       secret: { 
