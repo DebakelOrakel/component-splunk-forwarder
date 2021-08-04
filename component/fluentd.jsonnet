@@ -216,7 +216,10 @@ local statefulset = kube.StatefulSet(app_name) {
                     terminationMessagePath: '/dev/termination-log',
                 }],
                 volumes: [
+                    # TODO: if persistence disabled, see below
+                    { name: 'buffer', emptyDir: {}, },
                     { name: 'splunk-forwarder-config', configMap: { name: app_name, items: [ { key: 'td-agent.conf', path: 'fluent.conf' }, ], defaultMode: 420, optional: true }, },
+                ] + ( if !params.fluentd.ssl.enabled then [] else [
                     { 
                       name: 'splunk-forwarder', 
                       secret: { 
@@ -227,9 +230,7 @@ local statefulset = kube.StatefulSet(app_name) {
                         ], 
                       }, 
                     },
-                    # TODO: if persistence disabled, see below
-                    { name: 'buffer', emptyDir: {}, },
-                ] + ( if params.splunk.insecure then [] else [
+                ]) + ( if params.splunk.insecure then [] else [
                     { name: 'splunk-certs', secret: { secretName: app_name+'-splunk', items: [ { key: 'splunk-ca.crt', path: 'splunk-ca.crt' }, ], }, },
                 ]),
             },
