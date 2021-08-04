@@ -1,4 +1,39 @@
 parameters:
   splunk_forwarder:
     =_metadata: {}
-    namespace: syn-splunk-forwarder
+    namespace: openshift-logging
+
+    fluentd:
+      loglevel: info
+      replicas: 2
+
+      passphrase: {}        # insert value
+      sharedkey: splunkforwarding
+
+      ssl:
+        enabled: false
+        cert: {}
+        key: {}
+
+      resources:
+        requests:
+          cpu: 100m
+          memory: 512Mi
+        limits:
+          cpu: 500m
+          memory: 1024Mi
+
+      # less used parameters
+      nodeselector: {}
+      affinity: {}
+      tolerations: {}
+
+    splunk:
+      token: {}             # insert value
+      hostname: splunk.com  # insert value
+      port: 8088
+      insecure: true
+      protocol: https
+      index: openshift
+      sourcetype: openshift
+      source: openshift

@@ -9,4 +9,18 @@ parameters:
           - splunk-forwarder/component/main.jsonnet
         input_type: jsonnet
         output_path: splunk-forwarder/
-
+      # Fluentd instance
+      - input_paths:
+          - splunk-forwarder/component/fluentd.jsonnet
+        input_type: jsonnet
+        output_path: splunk-forwarder/${_instance}/
+        # output_path: splunk-forwarder/
+      # Helm Chart
+      # - output_path: splunk-forwarder/${_instance}/01_helmchart
+      #   input_type: helm
+      #   input_paths:
+      #     - splunk-forwarder/helm/fluentd
+      #   helm_params:
+      #     release_name: ${splunk-forwarder:release_name}
+      #     namespace: ${splunk-forwarder:namespace}
+      #   helm_values: ${splunk-forwarder:helm_values}
