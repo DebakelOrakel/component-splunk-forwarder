@@ -88,19 +88,6 @@ local secret = kube.Secret(app_name) {
         'forwarder-tls.key': std.base64(params.fluentd.ssl.key),
         // 'ca-bundle.crt': std.base64(params.fluentd.ssl.cert),  
     })
-/*
-data:
-{{- if .Values.forwarding.fluentd.ssl }}
-{{- $fluentdCaFile := .Files.Get .Values.forwarding.fluentd.caFile }}
-{{- $fluentdKeyFile := .Files.Get .Values.forwarding.fluentd.keyFile }}
-{{- if or (not $fluentdCaFile) (not $fluentdKeyFile) -}}
-{{- fail "Could not locate Fluentd Certificate or Private key" }}
-{{ end }}
-  forwarder-tls.crt: {{ $fluentdCaFile | b64enc }}
-  forwarder-tls.key: {{ $fluentdKeyFile | b64enc }}
-  ca-bundle.crt: {{ $fluentdCaFile | b64enc }}
-{{ end }}
-*/
 };
 
 local secret_splunk = kube.Secret(app_name+'-splunk') {
