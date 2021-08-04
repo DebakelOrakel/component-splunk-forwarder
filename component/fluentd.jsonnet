@@ -5,8 +5,9 @@ local inv = kap.inventory();
 // The hiera parameters for the component
 local params = inv.parameters.splunk_forwarder;
 // local instance = inv.parameters._instance;
-local instance = '987u3rfja';
-local app_name = 'splunk-forwarder-'+instance;
+// local instance = '987u3rfja';
+// local app_name = 'splunk-forwarder-'+instance;
+local app_name = inv.parameters._instance;
 local app_selector = {
     name: app_name
 };
