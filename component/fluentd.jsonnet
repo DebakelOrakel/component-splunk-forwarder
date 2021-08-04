@@ -30,7 +30,7 @@ local configmap = kube.ConfigMap(app_name) {
                 @type  forward
                 @id    input1
                 port  24224
-                $(tls_config)s
+                %(tls_config)s
                 <security>
                   shared_key "#{ENV['SHARED_KEY'] }"
                   self_hostname "#{ENV['HOSTNAME']}"
@@ -61,16 +61,14 @@ local configmap = kube.ConfigMap(app_name) {
                 </buffer>
                 # END: configurize buffer config
               </match>
-||| % ( if !params.fluentd.ssl.enabled then { 
-    tls_config: ''
-} else { 
-    tls_config: |||
+||| % { 
+    tls_config: if params.fluentd.ssl.enabled then |||
         <transport tls>
           cert_path /secret/fluentd/tls.crt
           private_key_path /secret/fluentd/tls.key
           private_key_passphrase "#{ENV['FLUENTD_SSL_PASSPHRASE'] }"
         </transport>
-||| })
+||| }
   },
 };
 
