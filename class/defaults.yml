@@ -27,7 +27,7 @@ parameters:
       # less used parameters
       nodeselector: {}
       affinity: {}
-      tolerations: {}
+      tolerations: []
 
     splunk:
       token: {}             # insert value
