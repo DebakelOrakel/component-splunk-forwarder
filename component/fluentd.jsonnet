@@ -82,12 +82,43 @@ local secret = kube.Secret(app_name) {
         'shared_key': std.base64(params.fluentd.sharedkey),
         'hec-token': std.base64(params.splunk.token),
         'fluentd-ssl-passsphrase': std.base64(params.fluentd.ssl.passphrase),
-    } + ( if !params.fluentd.ssl.enabled then {} else {
+    } /*+ ( if !params.fluentd.ssl.enabled then {} else {
         # TODO: consider using cert-manager
         'forwarder-tls.crt': std.base64(params.fluentd.ssl.cert),
         'forwarder-tls.key': std.base64(params.fluentd.ssl.key),
         // 'ca-bundle.crt': std.base64(params.fluentd.ssl.cert),  
-    })
+    }) */
+};
+
+local cert() = {
+    apiVersion: 'cert-manager.io/v1',
+    kind: 'Certificate',
+    metadata:{
+        labels: {
+            'app.kubernetes.io/name': app_name,
+            'name': app_name,
+        },
+        name: app_name,
+        namespace: params.namespace,
+    },
+    spec:{
+        dnsNames: [
+            app_name,
+            std.format("%s.%s", [app_name, params.namespace]),
+            std.format("%s.%s.svc", [app_name, params.namespace]),
+        ],
+        duration: '8760h0m0s',
+        issuerRef: {
+            name: 'splunk-forwarder-ca',
+        },
+        secretName: app_name+'-cert',
+        usages: [
+            'digital signature',
+            'key encipherment',
+            'server auth',
+            'client auth',
+        ],
+    },
 };
 
 local secret_splunk = kube.Secret(app_name+'-splunk') {
@@ -185,9 +216,9 @@ local statefulset = kube.StatefulSet(app_name) {
                     args: [ 'fluentd' ],
                     volumeMounts: [
                         { name: 'buffer', mountPath: '/var/log/fluentd' }, 
-                        { name: 'splunk-forwarder-config', readOnly: true, mountPath: '/etc/fluent/' },
+                        { name: 'fluentd-config', readOnly: true, mountPath: '/etc/fluent/' },
                     ] + ( if !params.fluentd.ssl.enabled then [] else [
-                        { name: 'splunk-forwarder', readOnly: true, mountPath: '/secret/fluentd' },
+                        { name: 'fluentd-certs', readOnly: true, mountPath: '/secret/fluentd' },
                     ]) + ( if params.splunk.insecure then [] else [
                         { name: 'splunk-certs', readOnly: true, mountPath: '/secret/splunk' },
                     ]),
@@ -213,15 +244,15 @@ local statefulset = kube.StatefulSet(app_name) {
                 volumes: [
                     # TODO: if persistence disabled, see below
                     { name: 'buffer', emptyDir: {}, },
-                    { name: 'splunk-forwarder-config', configMap: { name: app_name, items: [ { key: 'td-agent.conf', path: 'fluent.conf' }, ], defaultMode: 420, optional: true }, },
+                    { name: 'fluentd-config', configMap: { name: app_name, items: [ { key: 'td-agent.conf', path: 'fluent.conf' }, ], defaultMode: 420, optional: true }, },
                 ] + ( if !params.fluentd.ssl.enabled then [] else [
                     { 
-                      name: 'splunk-forwarder', 
+                      name: 'fluentd-certs', 
                       secret: { 
-                        secretName: app_name,
+                        secretName: app_name+'-cert',
                         items: [ 
-                          { key: 'forwarder-tls.crt', path: 'tls.crt' }, 
-                          { key: 'forwarder-tls.key', path: 'tls.key' }, 
+                          { key: 'tls.crt', path: 'tls.crt' }, 
+                          { key: 'tls.key', path: 'tls.key' }, 
                         ], 
                       }, 
                     },
@@ -263,6 +294,7 @@ spec:
        secret,
        if !params.splunk.insecure then secret_splunk
   ],
+  '14_certificate': if params.fluentd.ssl.enabled then cert(),
   '21_service': [
       service,
       service_headless

@@ -11,9 +11,7 @@ parameters:
       sharedkey: splunkforwarding
 
       ssl:
-        enabled: false
-        cert: ""
-        key: ""
+        enabled: true
         passphrase: ""      # insert value
 
       resources:
