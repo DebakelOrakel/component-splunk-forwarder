@@ -4,7 +4,6 @@ local kube = import 'lib/kube.libjsonnet';
 local inv = kap.inventory();
 // The hiera parameters for the component
 local params = inv.parameters.splunk_forwarder;
-// local app_name = 'splunk-forwarder-'+instance;
 local app_name = inv.parameters._instance;
 local app_selector = {
     name: app_name
@@ -82,12 +81,7 @@ local secret = kube.Secret(app_name) {
         'shared_key': std.base64(params.fluentd.sharedkey),
         'hec-token': std.base64(params.splunk.token),
         'fluentd-ssl-passsphrase': std.base64(params.fluentd.ssl.passphrase),
-    } /*+ ( if !params.fluentd.ssl.enabled then {} else {
-        # TODO: consider using cert-manager
-        'forwarder-tls.crt': std.base64(params.fluentd.ssl.cert),
-        'forwarder-tls.key': std.base64(params.fluentd.ssl.key),
-        // 'ca-bundle.crt': std.base64(params.fluentd.ssl.cert),  
-    }) */
+    }
 };
 
 local cert() = {

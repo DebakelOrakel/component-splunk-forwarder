@@ -12,7 +12,7 @@ parameters:
 
       ssl:
         enabled: true
-        passphrase: ""      # insert value
+        passphrase: ""      # unused
 
       resources:
         requests:
