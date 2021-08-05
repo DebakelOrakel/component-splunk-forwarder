@@ -2,7 +2,7 @@ parameters:
   splunk_forwarder:
     =_metadata: {}
     multi_instance: true
-    namespace: syn-splunk-forwarder
+    namespace: openshift-logging
 
     fluentd:
       loglevel: info
@@ -28,8 +28,8 @@ parameters:
       tolerations: []
 
     splunk:
-      token: ""             # insert value
-      hostname: splunk.com  # insert value
+      token: 4a8a737d-5452-426c-a6f7-106dca4e813f # default token
+      hostname: splunk.splunk.svc  # default hostname
       port: 8088
       insecure: true
       protocol: https

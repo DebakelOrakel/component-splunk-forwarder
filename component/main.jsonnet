@@ -68,7 +68,7 @@ local ca_cert() = {
 
 // Define outputs below
 {
-  '00_namespace': kube.Namespace(params.namespace),
+//   '00_namespace': kube.Namespace(params.namespace),
   '01_issuer': [
       issuer(),
       issuer_ca(),

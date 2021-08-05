@@ -14,7 +14,6 @@ parameters:
           - splunk-forwarder/component/fluentd.jsonnet
         input_type: jsonnet
         output_path: splunk-forwarder/${_instance}/
-        # output_path: splunk-forwarder/
       # Helm Chart
       # - output_path: splunk-forwarder/${_instance}/01_helmchart
       #   input_type: helm
