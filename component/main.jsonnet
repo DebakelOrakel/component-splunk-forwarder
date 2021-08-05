@@ -21,6 +21,24 @@ local issuer() = {
     },
 };
 
+local issuer_ca() = {
+    apiVersion: 'cert-manager.io/v1',
+    kind: 'Issuer',
+    metadata:{
+        labels: {
+            'app.kubernetes.io/name': 'splunk-forwarder-ca',
+            'name': 'splunk-forwarder-ca',
+        },
+        name: 'splunk-forwarder-ca',
+        namespace: params.namespace,
+    },
+    spec: {
+        ca:{
+            secretName: 'topolvm-webhook-ca',
+        },
+    },
+};
+
 local ca_cert() = {
     apiVersion: 'cert-manager.io/v1',
     kind: 'Certificate',
@@ -51,6 +69,9 @@ local ca_cert() = {
 // Define outputs below
 {
   '00_namespace': kube.Namespace(params.namespace),
-  '01_issuer': issuer(),
+  '01_issuer': [
+      issuer(),
+      issuer_ca(),
+  ],
   '02_ca_cert': ca_cert(),
 }
