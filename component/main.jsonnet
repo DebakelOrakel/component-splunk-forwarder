@@ -34,7 +34,7 @@ local issuer_ca() = {
     },
     spec: {
         ca:{
-            secretName: 'topolvm-webhook-ca',
+            secretName: 'splunk-forwarder-ca',
         },
     },
 };
