@@ -186,7 +186,7 @@ local statefulset = kube.StatefulSet(app_name) {
                         { name: 'fluentd-config', readOnly: true, mountPath: '/etc/fluent/' },
                     ] + ( if !params.fluentd.ssl.enabled then [] else [
                         { name: 'fluentd-certs', readOnly: true, mountPath: '/secret/fluentd' },
-                    ]) + ( if params.splunk.insecure then [] else [
+                    ]) + ( if params.splunk.ca == "" then [] else [
                         { name: 'splunk-certs', readOnly: true, mountPath: '/secret/splunk' },
                     ]),
                     livenessProbe: {
@@ -223,7 +223,7 @@ local statefulset = kube.StatefulSet(app_name) {
                         ], 
                       }, 
                     },
-                ]) + ( if params.splunk.insecure then [] else [
+                ]) + ( if params.splunk.ca == "" then [] else [
                     { name: 'splunk-certs', secret: { secretName: app_name+'-splunk', items: [ { key: 'splunk-ca.crt', path: 'splunk-ca.crt' }, ], }, },
                 ]),
             },
