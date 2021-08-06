@@ -38,3 +38,4 @@ parameters:
       index: openshift
       sourcetype: openshift
       source: openshift
+      ca: ""

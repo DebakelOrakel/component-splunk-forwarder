@@ -259,7 +259,7 @@ spec:
   '12_configmap': configmap,
   '13_secret': [
        secret,
-       if !params.splunk.insecure then secret_splunk
+       if params.splunk.ca != "" then secret_splunk
   ],
   '21_service': [
       service,
