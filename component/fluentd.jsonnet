@@ -103,7 +103,7 @@ local cert() = {
         ],
         duration: '8760h0m0s',
         issuerRef: {
-            name: 'splunk-forwarder-ca',
+            name: 'splunk-forwarder-selfsign',
         },
         secretName: app_name+'-cert',
         usages: [
