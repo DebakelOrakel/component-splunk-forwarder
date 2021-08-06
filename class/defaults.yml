@@ -11,7 +11,7 @@ parameters:
       sharedkey: splunkforwarding
 
       ssl:
-        enabled: true
+        enabled: false
         cert: ""
         key: ""
         passphrase: ""
