@@ -34,6 +34,7 @@ parameters:
       hostname: splunk.syn-splunk.svc  # default hostname
       port: 8088
       insecure: true
+      verify: true
       protocol: https
       index: openshift
       sourcetype: openshift

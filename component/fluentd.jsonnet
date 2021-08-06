@@ -15,6 +15,7 @@ local configmap = kube.ConfigMap(app_name) {
     data: {
         'fluentd-loglevel': params.fluentd.loglevel,
         'splunk-insecure': std.toString(params.splunk.insecure),
+        'splunk-ssl-verify': std.toString(params.splunk.verify),
         'splunk-hostname': params.splunk.hostname,
         'splunk-port': std.toString(params.splunk.port),
         'splunk-protocol': params.splunk.protocol,
@@ -46,6 +47,7 @@ local configmap = kube.ConfigMap(app_name) {
                 hec_port "#{ENV['SPLUNK_PORT'] }"
                 hec_token "#{ENV['SPLUNK_TOKEN'] }"
                 host "#{ENV['NODE_NAME']}"
+                ssl_verify "#{ENV['SPLUNK_SSL_VERIFY']}"
                 ca_file /secrets/splunk/splunk-ca.crt
                 # TODO: configurize buffer config
                 <buffer>
@@ -178,6 +180,7 @@ local statefulset = kube.StatefulSet(app_name) {
                         { name: 'SPLUNK_PORT', valueFrom: { configMapKeyRef: { name: app_name, key: 'splunk-port' }, }, },
                         { name: 'SPLUNK_PROTOCOL', valueFrom: { configMapKeyRef: { name: app_name, key: 'splunk-protocol' }, }, },
                         { name: 'SPLUNK_INSECURE', valueFrom: { configMapKeyRef: { name: app_name, key: 'splunk-insecure' }, }, },
+                        { name: 'SPLUNK_SSL_VERIFY', valueFrom: { configMapKeyRef: { name: app_name, key: 'splunk-ssl-verify' }, }, },
                         { name: 'SPLUNK_INDEX', valueFrom: { configMapKeyRef: { name: app_name, key: 'splunk-index' }, }, },
                     ],
                     args: [ 'fluentd' ],
