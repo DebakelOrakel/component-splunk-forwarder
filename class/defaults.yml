@@ -12,7 +12,9 @@ parameters:
 
       ssl:
         enabled: true
-        passphrase: ""      # unused
+        cert: ""
+        key: ""
+        passphrase: ""
 
       resources:
         requests:
@@ -29,7 +31,7 @@ parameters:
 
     splunk:
       token: 4a8a737d-5452-426c-a6f7-106dca4e813f # default token
-      hostname: splunk.splunk.svc  # default hostname
+      hostname: splunk.syn-splunk.svc  # default hostname
       port: 8088
       insecure: true
       protocol: https

@@ -81,38 +81,11 @@ local secret = kube.Secret(app_name) {
         'shared_key': std.base64(params.fluentd.sharedkey),
         'hec-token': std.base64(params.splunk.token),
         'fluentd-ssl-passsphrase': std.base64(params.fluentd.ssl.passphrase),
-    }
-};
-
-local cert() = {
-    apiVersion: 'cert-manager.io/v1',
-    kind: 'Certificate',
-    metadata:{
-        labels: {
-            'app.kubernetes.io/name': app_name,
-            'name': app_name,
-        },
-        name: app_name,
-        namespace: params.namespace,
-    },
-    spec:{
-        dnsNames: [
-            app_name,
-            std.format("%s.%s", [app_name, params.namespace]),
-            std.format("%s.%s.svc", [app_name, params.namespace]),
-        ],
-        duration: '8760h0m0s',
-        issuerRef: {
-            name: 'splunk-forwarder-selfsign',
-        },
-        secretName: app_name+'-cert',
-        usages: [
-            'digital signature',
-            'key encipherment',
-            'server auth',
-            'client auth',
-        ],
-    },
+    }+ ( if !params.fluentd.ssl.enabled then {} else {
+        'forwarder-tls.crt': std.base64(params.fluentd.ssl.cert),
+        'forwarder-tls.key': std.base64(params.fluentd.ssl.key),
+        'ca-bundle.crt': std.base64(params.fluentd.ssl.cert),  
+    })
 };
 
 local secret_splunk = kube.Secret(app_name+'-splunk') {
@@ -243,10 +216,10 @@ local statefulset = kube.StatefulSet(app_name) {
                     { 
                       name: 'fluentd-certs', 
                       secret: { 
-                        secretName: app_name+'-cert',
+                        secretName: app_name,
                         items: [ 
-                          { key: 'tls.crt', path: 'tls.crt' }, 
-                          { key: 'tls.key', path: 'tls.key' }, 
+                          { key: 'forwarder-tls.crt', path: 'tls.crt' }, 
+                          { key: 'forwarder-tls.key', path: 'tls.key' }, 
                         ], 
                       }, 
                     },
@@ -288,7 +261,6 @@ spec:
        secret,
        if !params.splunk.insecure then secret_splunk
   ],
-  '14_certificate': if params.fluentd.ssl.enabled then cert(),
   '21_service': [
       service,
       service_headless
